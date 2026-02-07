@@ -10,13 +10,17 @@ function App() {
   return saved ? JSON.parse(saved) : [];
 });
 
+  const [role, setRole] = useState(() => {
+    return localStorage.getItem("role") || null;
+  });
+
   const [menu, setMenu] = useState(() => {
     const saved = localStorage.getItem("menu");
     return saved ? JSON.parse(saved) : foodItems;
   });
 
   const [showCheckout, setShowCheckout] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const isAdmin = role === "admin";
   const [newName, setNewName] = useState("");
   const [newPrice, setNewPrice] = useState("");
 
@@ -56,6 +60,10 @@ const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     localStorage.setItem("menu", JSON.stringify(menu));
   }, [menu]);
 
+  useEffect(() => {
+    if (role) localStorage.setItem("role", role);
+  }, [role]);
+
 const updateQty = (id, change) => {
   setCart(cart =>
     cart
@@ -72,8 +80,47 @@ const removeFromCart = (id) => {
   setCart(cart.filter(item => item.id !== id));
 };
 
-return (
-  <div className="min-h-screen bg-gray-100 p-6">
+  if (!role) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-8 rounded-xl shadow-lg w-80">
+          <h2 className="text-2xl font-bold mb-6 text-center">
+            Canteen Login
+          </h2>
+
+          <button
+            className="w-full bg-blue-600 text-white py-2 rounded mb-3 hover:bg-blue-700"
+            onClick={() => setRole("student")}
+          >
+            Login as Student
+          </button>
+
+          <button
+            className="w-full bg-gray-900 text-white py-2 rounded hover:bg-gray-800"
+            onClick={() => {
+              const pass = prompt("Enter Admin Password");
+              if (pass === "admin123") setRole("admin");
+              else alert("Wrong password");
+            }}
+          >
+            Login as Admin
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+  <div className="min-h-screen bg-gray-100 p-6 relative">
+      <button
+        className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded"
+        onClick={() => {
+          setRole(null);
+          localStorage.clear();
+        }}
+      >
+        Logout
+      </button>
       {isAdmin ? (
         <div className="flex justify-between items-center bg-white shadow px-6 py-4 mb-6 rounded-lg">
           <h2 className="text-xl font-bold text-gray-800">
@@ -82,7 +129,7 @@ return (
 
           <button
             className="bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800"
-            onClick={() => setIsAdmin(false)}
+            onClick={() => setRole("student")}
           >
             Exit Admin
           </button>
@@ -90,7 +137,7 @@ return (
       ) : (
         <button
           className="mb-4 bg-black text-white px-4 py-2 rounded"
-          onClick={() => setIsAdmin(true)}
+          onClick={() => setRole("admin")}
         >
           Switch to Admin Mode
         </button>
@@ -178,7 +225,7 @@ return (
         <>
           <button
             className="mb-6 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-            onClick={() => setIsAdmin(true)}
+            onClick={() => setRole("admin")}
           >
             Enter Admin Panel
           </button>
