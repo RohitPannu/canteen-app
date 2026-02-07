@@ -61,11 +61,26 @@ const removeFromCart = (id) => {
 };
 
 return (
-    <div style={{ padding: "20px" }}>
+  <div className="min-h-screen bg-gray-100 p-6">
       <Navbar cartCount={cart.length} />
 
       {foodItems.map(item => (
-        <FoodCard key={item.id} item={item} addToCart={addToCart} />
+        <div
+          key={item.id}
+          className="bg-white shadow-md rounded-lg p-4 mb-4 flex justify-between items-center"
+        >
+          <div>
+            <h3 className="text-lg font-semibold">{item.name}</h3>
+            <p className="text-gray-600">Rs. {item.price}</p>
+          </div>
+
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            onClick={() => addToCart(item)}
+          >
+            Add
+          </button>
+        </div>
       ))}
 
       <hr />
@@ -73,19 +88,33 @@ return (
       <h2>🛒 Cart ({cart.length})</h2>
       {cart.length === 0 && <p>No items in cart</p>}
       {cart.map(item => (
-  
-  <div key={item.id}>
-    <p>
-      {item.name} — Rs. {item.price} × {item.qty}
-    </p>
+        <div key={item.id} className="bg-white p-4 rounded-lg shadow mb-4">
+          <p className="font-medium">{item.name}</p>
 
-    <button onClick={() => updateQty(item.id, -1)}>-</button>
-    <button onClick={() => updateQty(item.id, 1)}>+</button>
-    <button onClick={() => removeFromCart(item.id)}>Remove</button>
-  </div>
-))}
+          <div className="flex items-center gap-3 mt-2">
+            <button
+              className="px-2 bg-red-400 text-white rounded"
+              onClick={() => decreaseQty(item.id)}
+            >−</button>
+
+            <span>{item.qty}</span>
+
+            <button
+              className="px-2 bg-green-500 text-white rounded"
+              onClick={() => increaseQty(item.id)}
+            >+</button>
+          </div>
+
+          <p className="mt-2 text-sm text-gray-600">
+            Rs. {item.price * item.qty}
+          </p>
+        </div>
+      ))}
     <h3 style={{ marginTop: "20px", fontWeight: "bold" }}>Total Bill: Rs. {total}</h3>
-        <button onClick={() => setShowCheckout(true)}>
+        <button
+          className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700"
+          onClick={() => setShowCheckout(true)}
+        >
           Checkout
         </button>
 
