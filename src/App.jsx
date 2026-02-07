@@ -74,62 +74,129 @@ const removeFromCart = (id) => {
 
 return (
   <div className="min-h-screen bg-gray-100 p-6">
-      <button
-        className="mb-4 bg-black text-white px-4 py-2 rounded"
-        onClick={() => setIsAdmin(!isAdmin)}
-      >
-        Switch to {isAdmin ? "User" : "Admin"} Mode
-      </button>
+      {isAdmin ? (
+        <div className="flex justify-between items-center bg-white shadow px-6 py-4 mb-6 rounded-lg">
+          <h2 className="text-xl font-bold text-gray-800">
+            🛠 Admin Dashboard
+          </h2>
+
+          <button
+            className="bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800"
+            onClick={() => setIsAdmin(false)}
+          >
+            Exit Admin
+          </button>
+        </div>
+      ) : (
+        <button
+          className="mb-4 bg-black text-white px-4 py-2 rounded"
+          onClick={() => setIsAdmin(true)}
+        >
+          Switch to Admin Mode
+        </button>
+      )}
 
       <Navbar cartCount={cart.length} />
 
       {isAdmin && (
-        <div className="bg-white p-4 rounded shadow mb-6">
-          <h3 className="font-bold mb-2">➕ Add Food Item</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="bg-white p-6 rounded-xl shadow-md">
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">
+              ➕ Add New Item
+            </h3>
 
-          <input
-            placeholder="Food Name"
-            className="border p-2 w-full mb-2"
-            onChange={e => setNewName(e.target.value)}
-          />
+            <input
+              type="text"
+              placeholder="Item Name"
+              className="w-full border rounded px-3 py-2 mb-3 focus:outline-none focus:ring focus:ring-blue-300"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+            />
 
-          <input
-            placeholder="Price"
-            type="number"
-            className="border p-2 w-full mb-2"
-            onChange={e => setNewPrice(e.target.value)}
-          />
+            <input
+              type="number"
+              placeholder="Price (Rs)"
+              className="w-full border rounded px-3 py-2 mb-4 focus:outline-none focus:ring focus:ring-blue-300"
+              value={newPrice}
+              onChange={(e) => setNewPrice(e.target.value)}
+            />
 
-          <button
-            className="bg-green-600 text-white px-4 py-2 rounded"
-            onClick={() => {
-              setMenu([...menu, {
-                id: Date.now(),
-                name: newName,
-                price: Number(newPrice),
-              }]);
-              setNewName("");
-              setNewPrice("");
-            }}
-          >
-            Add Item
-          </button>
+            <button
+              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              onClick={() => {
+                setMenu([...menu, {
+                  id: Date.now(),
+                  name: newName,
+                  price: Number(newPrice),
+                }]);
+                setNewName("");
+                setNewPrice("");
+              }}
+            >
+              Add Item
+            </button>
+          </div>
+
+          <div className="md:col-span-2 bg-white p-6 rounded-xl shadow-md">
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">
+              📋 Menu Items
+            </h3>
+
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="text-left border-b">
+                  <th className="py-2">Name</th>
+                  <th>Price</th>
+                  <th className="text-right">Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {menu.map(item => (
+                  <tr key={item.id} className="border-b hover:bg-gray-50">
+                    <td className="py-2">{item.name}</td>
+                    <td>Rs. {item.price}</td>
+                    <td className="text-right">
+                      <button
+                        className="text-red-600 hover:underline"
+                        onClick={() =>
+                          setMenu(menu.filter(i => i.id !== item.id))
+                        }
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
+      {!isAdmin && (
+        <>
+          <button
+            className="mb-6 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+            onClick={() => setIsAdmin(true)}
+          >
+            Enter Admin Panel
+          </button>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {menu.map(item => (
         <div
           key={item.id}
-          className="bg-white shadow-md rounded-lg p-4 mb-4 flex justify-between items-center"
+          className="bg-white shadow-md rounded-lg p-4 flex flex-col justify-between"
         >
           <div>
             <h3 className="text-lg font-semibold">{item.name}</h3>
             <p className="text-gray-600">Rs. {item.price}</p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-4">
             <button
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex-1"
               onClick={() => addToCart(item)}
             >
               Add
@@ -147,6 +214,9 @@ return (
           </div>
         </div>
       ))}
+      </div>
+        </>
+      )}
 
       <hr />
 
