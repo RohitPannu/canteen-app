@@ -5,6 +5,11 @@ import FoodCard from "./components/FoodCard";
 import CartItem from "./components/CartItem";
 
 function App() {
+  const [orders, setOrders] = useState(() => {
+  const saved = localStorage.getItem("orders");
+  return saved ? JSON.parse(saved) : [];
+});
+
   const [showCheckout, setShowCheckout] = useState(false);
 
   const [cart, setCart] = useState(() => {
@@ -34,6 +39,10 @@ const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
+
+  useEffect(() => {
+    localStorage.setItem("orders", JSON.stringify(orders));
+  }, [orders]);
 
 const updateQty = (id, change) => {
   setCart(cart =>
@@ -80,6 +89,25 @@ return (
           Checkout
         </button>
 
+      <hr />
+      <h2>📦 Order History</h2>
+
+      {orders.length === 0 && <p>No past orders</p>}
+
+      {orders.map(order => (
+        <div key={order.id} style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "10px" }}>
+          <p><strong>Date:</strong> {order.date}</p>
+
+          {order.items.map(item => (
+            <p key={item.id}>
+              {item.name} × {item.qty}
+            </p>
+          ))}
+
+          <strong>Total: Rs. {order.total}</strong>
+        </div>
+      ))}
+
       {showCheckout && (
         <div style={{
           position: "fixed",
@@ -110,10 +138,18 @@ return (
             <br /><br />
 
             <button onClick={() => {
-              alert("Order placed successfully! 🎉");
-              setCart([]);
-              setShowCheckout(false);
-            }}>
+  const newOrder = {
+    id: Date.now(),
+    items: cart,
+    total,
+    date: new Date().toLocaleString(),
+  };
+
+  setOrders([...orders, newOrder]);
+  setCart([]);
+  setShowCheckout(false);
+}}
+            > 
               Confirm Order
             </button>
 
