@@ -10,7 +10,15 @@ function App() {
   return saved ? JSON.parse(saved) : [];
 });
 
+  const [menu, setMenu] = useState(() => {
+    const saved = localStorage.getItem("menu");
+    return saved ? JSON.parse(saved) : foodItems;
+  });
+
   const [showCheckout, setShowCheckout] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
 
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem("cart");
@@ -44,6 +52,10 @@ const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
     localStorage.setItem("orders", JSON.stringify(orders));
   }, [orders]);
 
+  useEffect(() => {
+    localStorage.setItem("menu", JSON.stringify(menu));
+  }, [menu]);
+
 const updateQty = (id, change) => {
   setCart(cart =>
     cart
@@ -62,9 +74,50 @@ const removeFromCart = (id) => {
 
 return (
   <div className="min-h-screen bg-gray-100 p-6">
+      <button
+        className="mb-4 bg-black text-white px-4 py-2 rounded"
+        onClick={() => setIsAdmin(!isAdmin)}
+      >
+        Switch to {isAdmin ? "User" : "Admin"} Mode
+      </button>
+
       <Navbar cartCount={cart.length} />
 
-      {foodItems.map(item => (
+      {isAdmin && (
+        <div className="bg-white p-4 rounded shadow mb-6">
+          <h3 className="font-bold mb-2">➕ Add Food Item</h3>
+
+          <input
+            placeholder="Food Name"
+            className="border p-2 w-full mb-2"
+            onChange={e => setNewName(e.target.value)}
+          />
+
+          <input
+            placeholder="Price"
+            type="number"
+            className="border p-2 w-full mb-2"
+            onChange={e => setNewPrice(e.target.value)}
+          />
+
+          <button
+            className="bg-green-600 text-white px-4 py-2 rounded"
+            onClick={() => {
+              setMenu([...menu, {
+                id: Date.now(),
+                name: newName,
+                price: Number(newPrice),
+              }]);
+              setNewName("");
+              setNewPrice("");
+            }}
+          >
+            Add Item
+          </button>
+        </div>
+      )}
+
+      {menu.map(item => (
         <div
           key={item.id}
           className="bg-white shadow-md rounded-lg p-4 mb-4 flex justify-between items-center"
@@ -74,12 +127,24 @@ return (
             <p className="text-gray-600">Rs. {item.price}</p>
           </div>
 
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            onClick={() => addToCart(item)}
-          >
-            Add
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              onClick={() => addToCart(item)}
+            >
+              Add
+            </button>
+            {isAdmin && (
+              <button
+                className="text-red-600 text-sm"
+                onClick={() =>
+                  setMenu(menu.filter(i => i.id !== item.id))
+                }
+              >
+                Delete
+              </button>
+            )}
+          </div>
         </div>
       ))}
 
