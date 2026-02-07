@@ -1,4 +1,5 @@
 function CartItem({ item, increaseQty, decreaseQty }) {
+    
   return (
     <div
       style={{
@@ -14,6 +15,10 @@ function CartItem({ item, increaseQty, decreaseQty }) {
       <div>
         <p>{item.name} — Rs. {item.price}</p>
         <p>Total: Rs. {item.price * item.qty}</p>
+        <button onClick={() => setShowCheckout(true)}>
+          Checkout
+        </button>
+
       </div>
       <div>
         <button onClick={() => decreaseQty(item.id)}>➖</button>
